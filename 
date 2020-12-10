@@ -1,0 +1,117 @@
+warning: LF will be replaced by CRLF in src/app/clientes/clientes.component.html.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in src/app/clientes/clientes.component.ts.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in src/app/paginator/paginator.component.html.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in src/app/paginator/paginator.component.ts.
+The file will have its original line endings in your working directory
+[1mdiff --git a/src/app/clientes/clientes.component.html b/src/app/clientes/clientes.component.html[m
+[1mindex fcb2a15..1438ed9 100644[m
+[1m--- a/src/app/clientes/clientes.component.html[m
+[1m+++ b/src/app/clientes/clientes.component.html[m
+[36m@@ -47,6 +47,6 @@[m
+         </tr>[m
+       </tbody>[m
+     </table>[m
+[31m-    <paginator-nav></paginator-nav>[m
+[32m+[m[32m    <paginator-nav *ngIf="paginador" [paginador] = "paginador"></paginator-nav>[m
+   </div>[m
+   </div>[m
+[1mdiff --git a/src/app/clientes/clientes.component.ts b/src/app/clientes/clientes.component.ts[m
+[1mindex 9fd17fd..ab01587 100644[m
+[1m--- a/src/app/clientes/clientes.component.ts[m
+[1m+++ b/src/app/clientes/clientes.component.ts[m
+[36m@@ -13,6 +13,7 @@[m [mimport { ActivatedRoute } from '@angular/router';[m
+ export class ClientesComponent implements OnInit {[m
+ [m
+   clientes: Cliente[];[m
+[32m+[m[32m  paginador: any;[m
+ [m
+ [m
+   constructor( private clienteService: ClienteService, private activatedRoute: ActivatedRoute) { }[m
+[36m@@ -31,7 +32,10 @@[m [mexport class ClientesComponent implements OnInit {[m
+           console.log(cliente.nombre);[m
+         });[m
+       })[m
+[31m-    ).subscribe(response => this.clientes = response.content as Cliente[]);[m
+[32m+[m[32m    ).subscribe(response => {[m
+[32m+[m[32m      this.clientes = response.content as Cliente[][m
+[32m+[m[32m      this.paginador = response;[m
+[32m+[m[32m    });[m
+   }[m
+   );[m
+   }[m
+[1mdiff --git a/src/app/paginator/paginator.component.html b/src/app/paginator/paginator.component.html[m
+[1mindex 1c2a7d6..f67fecc 100644[m
+[1m--- a/src/app/paginator/paginator.component.html[m
+[1m+++ b/src/app/paginator/paginator.component.html[m
+[36m@@ -1 +1,23 @@[m
+[31m-<p>paginator works!</p>[m
+[32m+[m[32m<ul *ngIf = "paginas?.length > 0" class="pagination">[m
+[32m+[m
+[32m+[m[32m  <li class="page-item" *ngIf="paginador.number > 0">[m
+[32m+[m[32m    <a class="page-link" [routerLink]="['/clientes/page', paginador.number-1]">&laquo;</a>[m
+[32m+[m[32m  </li>[m
+[32m+[m
+[32m+[m[32m  <li [ngClass]="paginador.first?'disabled page-item':'page-item'">[m
+[32m+[m[32m    <a class="page-link" [routerLink]="['/clientes/page', 0]">Primera</a>[m
+[32m+[m[32m  </li>[m
+[32m+[m
+[32m+[m[32m  <li class="page-item" *ngFor= "let pagina of paginas" [ngClass]="pagina-1 == paginador.number?'active':''">[m
+[32m+[m[32m    <span class="page-link" *ngIf="pagina-1 == paginador.number">{{pagina}}</span>[m
+[32m+[m[32m    <a *ngIf="pagina-1 != paginador.number" class="page-link" [routerLink]="['/clientes/page', pagina-1]">{{pagina}}</a>[m
+[32m+[m[32m  </li>[m
+[32m+[m
+[32m+[m[32m  <li [ngClass]="paginador.last?'disabled page-item':'page-item'">[m
+[32m+[m[32m    <a class="page-link" [routerLink]="['/clientes/page', paginador.totalPages-1]">Última</a>[m
+[32m+[m[32m  </li>[m
+[32m+[m
+[32m+[m[32m  <li class="page-item" *ngIf="paginador.number < paginador.totalPages-1">[m
+[32m+[m[32m    <a class="page-link" [routerLink]="['/clientes/page', paginador.number+1]">&raquo;</a>[m
+[32m+[m[32m  </li>[m
+[32m+[m[32m</ul>[m
+[1mdiff --git a/src/app/paginator/paginator.component.ts b/src/app/paginator/paginator.component.ts[m
+[1mindex aaafd06..f32b2ff 100644[m
+[1m--- a/src/app/paginator/paginator.component.ts[m
+[1m+++ b/src/app/paginator/paginator.component.ts[m
+[36m@@ -1,14 +1,37 @@[m
+[31m-import { Component, OnInit } from '@angular/core';[m
+[32m+[m[32mimport { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';[m
+ [m
+ @Component({[m
+   selector: 'paginator-nav',[m
+   templateUrl: './paginator.component.html'[m
+ })[m
+[31m-export class PaginatorComponent implements OnInit {[m
+[32m+[m[32mexport class PaginatorComponent implements OnInit, OnChanges {[m
+ [m
+[32m+[m[32m  @Input() paginador: any;[m
+[32m+[m[32m  paginas: number[];[m
+[32m+[m[32m  desde: number;[m
+[32m+[m[32m  hasta: number;[m
+   constructor() { }[m
+ [m
+   ngOnInit() {[m
+[32m+[m[32m    this.initPaginator();[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  ngOnChanges( changes: SimpleChanges){[m
+[32m+[m[32m    let paginadorActualizado = changes ['paginador'];[m
+[32m+[m
+[32m+[m[32m    if(paginadorActualizado.previousValue){[m
+[32m+[m[32m      this.initPaginator();[m
+[32m+[m[32m    }[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  private initPaginator(): void {[m
+[32m+[m[32m    this.desde= Math.min( Math.max (1, this.paginador.number - 4), this.paginador.totalPages-5);[m
+[32m+[m[32m    this.hasta= Math.max( Math.min(this.paginador.totalPages, this.paginador.number+4), 6);[m
+[32m+[m[32m    if(this.paginador.totalPages>5){[m
+[32m+[m[32m      this.paginas = new Array(this.hasta - this.desde +1 ).fill(0).map((_valor,indice) => indice + this.desde);[m
+[32m+[m[32m    }else{[m
+[32m+[m[32m    this.paginas = new Array(this.paginador.totalPages).fill(0).map((_valor,indice) => indice+1);[m
+[32m+[m[32m  }[m
+   }[m
+ [m
+ }[m
