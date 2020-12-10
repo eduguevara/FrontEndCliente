@@ -25,3 +25,14 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+
+##Para instalar bootstrap de forma local en el proyecto en el node modules:
+
+npm install bootstrap@4.0.0-beta.2 jquery popper.js --save
+
+## Crear un nuevo directorio dentro de la carpeta clientes
+ng generate component clientes/form --flat o ng g c clientes/form --flat
+
+##Instalar el sweetalet para las alertas (Se instala esta version porque la si se instala la ultima version de error)
+npm install --save sweetalert2@7.26.9

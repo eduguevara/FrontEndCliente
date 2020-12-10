@@ -1,0 +1,10 @@
+<!-- {{habilitar==true? 'Ocultar': 'Mostrar'}} Hace referencia a una condición  if habilitar es true muestrame ocultar de lo contrario muestra mostrar-->
+<button type="button" (click)="setHabilitar()" class="btn btn-primay my-3">{{habilitar==true? 'Ocultar': 'Mostrar'}} </button>
+<div class="card">
+ <div class="card-header">
+   Listado de cursos
+ </div>
+  <ul class= "list-group" *ngIf = "habilitar == true">
+      <li class="list-group-item" *ngFor="let curso of listaCurso">{{ curso }}</li>
+  </ul>
+</div>
